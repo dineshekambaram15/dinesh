@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Git clone') {
+            steps {
+                git credentialsId: 'Git-devops-cred', url: 'https://github.com/dineshekambaram15/dinesh.git'
+            }
+        }
+        
+        stage('Docker build') {
+            steps {
+                sh "docker build -t dineshekambaram15/dinesh:01 ."
+            }
+        }
+        stage('Docker stop') {
+            steps {
+                sh 'docker stop $(docker ps -a -q)'
+            }
+        }
+        stage('Docker remove') {
+            steps {
+                sh 'docker rm $(docker ps -a -q)'
+            }
+        }
+        stage('Docker run') {
+            steps {
+                sh "docker run -itd --name=dcontainer -p 3214:5000 dineshekambaram15/dinesh:01"
+            }
+        }
+        stage('Docker image remove') {
+            steps {
+                sh "docker image prune -f"
+                
+            }
+        }
+    }
+}
